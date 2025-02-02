@@ -1,26 +1,9 @@
-import { useContext, useState } from 'react';
+import { useContext } from 'react';
 import NapData from './components/NapData';
 import WakeTime from './components/WakeTime';
 import { Card, CardContent, CardHeader } from './components/ui/card';
 import { SleepContext } from './lib/SleepContext';
 
-interface AppState {
-	nap1: {
-		sleep: number;
-		rest: number;
-		debt: number;
-	};
-	nap2: {
-		sleep: number;
-		rest: number;
-		debt: number;
-	};
-	nap3: {
-		sleep: number;
-		rest: number;
-		debt: number;
-	};
-}
 export default function App() {
 	const {
 		state: { bedTime },
