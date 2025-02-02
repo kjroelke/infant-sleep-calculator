@@ -18,38 +18,21 @@ export default function NapData({ index }: NapDataProps) {
 	const { state, dispatch } = useContext(SleepContext);
 	const { nap1Time } = state;
 	const napKey = `nap${index}` as keyof typeof state.napData;
-	const { debt: sleepDebt } = state.napData[napKey];
-	const [sleep, setSleep] = useState({
-		hours: 0,
-		minutes: 0,
-	});
-	const [rest, setRest] = useState(0);
-
-	useEffect(() => {
-		const napKey = `nap${index}` as keyof (typeof state)['napData'];
-		if (sleep.hours === 0 && sleep.minutes === 0 && rest === 0) {
-			dispatch({ type: 'napData/reset', payload: napKey });
-			return;
-		}
-		const calculatedRest = rest > 0 ? Math.round(rest * 0.5) : 0;
-		const sleepTime = sleep.hours * 60 + sleep.minutes;
-		const debt = 60 - sleepTime - calculatedRest;
-		const data = {
-			sleep: sleepTime,
-			rest: calculatedRest,
-			debt,
-		};
-		if (3 === index) {
-			data.debt = 0;
-		}
+	const {
+		sleep: { hours, minutes },
+		rest,
+		debt: sleepDebt,
+	} = state.napData[napKey];
+	function handleChange(type: 'hours' | 'minutes' | 'rest', value: number) {
 		dispatch({
 			type: 'napData/update',
 			payload: {
 				napKey,
-				data,
+				type,
+				value,
 			},
 		});
-	}, [sleep, rest]);
+	}
 
 	return (
 		<Card>
@@ -77,11 +60,9 @@ export default function NapData({ index }: NapDataProps) {
 							name={`nap-${index}`}
 							max={2}
 							min={0}
+							value={hours}
 							onChange={(ev) =>
-								setSleep((prev) => ({
-									...prev,
-									hours: parseInt(ev.target.value),
-								}))
+								handleChange('hours', parseInt(ev.target.value))
 							}
 						/>
 						<Label htmlFor={`nap-${index}-hours`}>Hours</Label>
@@ -92,11 +73,12 @@ export default function NapData({ index }: NapDataProps) {
 							name={`nap-${index}`}
 							max={59}
 							min={0}
+							value={minutes}
 							onChange={(ev) =>
-								setSleep((prev) => ({
-									...prev,
-									minutes: parseInt(ev.target.value),
-								}))
+								handleChange(
+									'minutes',
+									parseInt(ev.target.value),
+								)
 							}
 						/>
 						<Label htmlFor={`nap-${index}-minutes`}>Minutes</Label>
@@ -123,8 +105,12 @@ export default function NapData({ index }: NapDataProps) {
 								name={`rest-time-${index}`}
 								min='0'
 								max='240'
+								value={rest}
 								onChange={(ev) =>
-									setRest(parseInt(ev.target.value))
+									handleChange(
+										'rest',
+										parseInt(ev.target.value),
+									)
 								}
 							/>
 							<Label htmlFor={`rest-time-${index}`}>
