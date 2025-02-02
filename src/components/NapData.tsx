@@ -3,6 +3,13 @@ import { SleepContext } from '@/lib/SleepContext';
 import { Card, CardContent, CardDescription, CardHeader } from './ui/card';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
+import {
+	Tooltip,
+	TooltipContent,
+	TooltipProvider,
+	TooltipTrigger,
+} from '@/components/ui/tooltip';
+import SleepDebtNotice from './SleepDebtNotice';
 
 interface NapDataProps {
 	index: number;
@@ -12,7 +19,6 @@ export default function NapData({ index }: NapDataProps) {
 	const { nap1Time } = state;
 	const napKey = `nap${index}` as keyof typeof state.napData;
 	const { debt: sleepDebt } = state.napData[napKey];
-
 	const [sleep, setSleep] = useState({
 		hours: 0,
 		minutes: 0,
@@ -28,16 +34,19 @@ export default function NapData({ index }: NapDataProps) {
 		const calculatedRest = rest > 0 ? Math.round(rest * 0.5) : 0;
 		const sleepTime = sleep.hours * 60 + sleep.minutes;
 		const debt = 60 - sleepTime - calculatedRest;
-
+		const data = {
+			sleep: sleepTime,
+			rest: calculatedRest,
+			debt,
+		};
+		if (3 === index) {
+			data.debt = 0;
+		}
 		dispatch({
 			type: 'napData/update',
 			payload: {
 				napKey,
-				data: {
-					sleep: sleepTime,
-					rest,
-					debt: debt > 0 ? debt : 0,
-				},
+				data,
 			},
 		});
 	}, [sleep, rest]);
@@ -46,7 +55,7 @@ export default function NapData({ index }: NapDataProps) {
 		<Card>
 			<CardHeader className='gap-2'>
 				Nap {index}{' '}
-				{1 === index && (
+				{1 === index && nap1Time && (
 					<CardDescription>
 						Nap 1 should be at {nap1Time}
 					</CardDescription>
@@ -56,15 +65,10 @@ export default function NapData({ index }: NapDataProps) {
 						Nap 3 should be at 2hr and 15min after Nap 2 ended
 					</CardDescription>
 				)}
-				{sleepDebt > 0 && (
-					<span className='text-red-500 italic text-sm'>
-						{sleepDebt}m of sleep debt accrued this nap
-					</span>
-				)}
+				<SleepDebtNotice sleepDebt={sleepDebt} />
 			</CardHeader>
-
 			<CardContent>
-				<div className='flex flex-wrap items-center gap-4'>
+				<div className='flex flex-wrap items-end gap-4'>
 					<div className='flex items-center gap-2'>
 						<Input
 							inputMode='numeric'
@@ -97,11 +101,20 @@ export default function NapData({ index }: NapDataProps) {
 						/>
 						<Label htmlFor={`nap-${index}-minutes`}>Minutes</Label>
 					</div>
-					<div className='input'>
-						<h3>Rest Time</h3>
-						<span className='italic text-sm'>
-							(minutes spent resting, but not asleep)
-						</span>
+					<div className='input flex flex-col'>
+						<TooltipProvider>
+							<Tooltip>
+								<TooltipTrigger className='self-start'>
+									<h3>Rest Time</h3>
+								</TooltipTrigger>
+								<TooltipContent>
+									<span className='italic text-sm'>
+										Minutes spent resting, but not asleep
+									</span>
+								</TooltipContent>
+							</Tooltip>
+						</TooltipProvider>
+
 						<div className='flex items-center gap-2'>
 							<Input
 								inputMode='numeric'
