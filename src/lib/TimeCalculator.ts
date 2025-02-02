@@ -1,4 +1,5 @@
 import { addMinutes, isWithinInterval, parse, subMinutes } from 'date-fns';
+import { AppState } from './sleepReducer';
 
 const format = 'h:mm a';
 export function getNap1Time({
@@ -50,4 +51,18 @@ export function getBedTime(sleepDebt: number): string {
 	return addMinutes(idealBedTime, Math.abs(sleepDebt)).toLocaleTimeString(
 		...timeStringArgs,
 	);
+}
+
+export function calcNapDebt(
+	napKey: keyof AppState['napData'],
+	updatedState: AppState,
+): number {
+	const calculatedSleep =
+		updatedState.napData[napKey].sleep.hours * 60 +
+		updatedState.napData[napKey].sleep.minutes +
+		Math.round(updatedState.napData[napKey].rest * 0.5);
+	if ('nap3' === napKey) {
+		return calculatedSleep * -1;
+	}
+	return 60 - calculatedSleep;
 }
