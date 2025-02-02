@@ -67,6 +67,7 @@ export default function NapData({ index }: NapDataProps) {
 				<div className='flex flex-wrap items-center gap-4'>
 					<div className='flex items-center gap-2'>
 						<Input
+							inputMode='numeric'
 							type='number'
 							id={`nap-${index}-hours`}
 							name={`nap-${index}`}
@@ -81,6 +82,7 @@ export default function NapData({ index }: NapDataProps) {
 						/>
 						<Label htmlFor={`nap-${index}-hours`}>Hours</Label>
 						<Input
+							inputMode='numeric'
 							type='number'
 							id={`nap-${index}-minutes`}
 							name={`nap-${index}`}
@@ -102,6 +104,7 @@ export default function NapData({ index }: NapDataProps) {
 						</span>
 						<div className='flex items-center gap-2'>
 							<Input
+								inputMode='numeric'
 								type='number'
 								id={`rest-time-${index}`}
 								name={`rest-time-${index}`}
