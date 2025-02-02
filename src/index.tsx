@@ -25,3 +25,19 @@ createRoot(root).render(
 		</footer>
 	</StrictMode>,
 );
+
+if ('serviceWorker' in navigator) {
+	window.addEventListener('load', () => {
+		navigator.serviceWorker.register('/src/service-worker.ts').then(
+			(registration) => {
+				console.log(
+					'Service Worker registered with scope:',
+					registration.scope,
+				);
+			},
+			(error) => {
+				console.log('Service Worker registration failed:', error);
+			},
+		);
+	});
+}
