@@ -1,5 +1,11 @@
-import { createContext, useReducer, ReactNode, Dispatch } from 'react';
-import { calcSleepDebt, getBedTime, getNap1Time } from './TimeCalculator';
+import {
+	createContext,
+	useReducer,
+	useEffect,
+	ReactNode,
+	Dispatch,
+} from 'react';
+import { getBedTime, getNap1Time } from './TimeCalculator';
 
 interface AppState {
 	napData: {
@@ -40,6 +46,33 @@ const initialState: AppState = {
 	totalSleepDebt: 0,
 };
 
+const LOCAL_STORAGE_KEY = 'sleepAppState';
+const LAST_RESET_KEY = 'lastResetDate';
+
+const saveStateToLocalStorage = (state: AppState) => {
+	const stateWithTimestamp = {
+		...state,
+		timestamp: new Date().toISOString(),
+	};
+	localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(stateWithTimestamp));
+};
+
+const loadStateFromLocalStorage = (): AppState | null => {
+	const state = localStorage.getItem(LOCAL_STORAGE_KEY);
+	return state ? JSON.parse(state) : null;
+};
+
+const shouldResetState = (): boolean => {
+	const lastReset = localStorage.getItem(LAST_RESET_KEY);
+	const today = new Date().toLocaleDateString();
+	return lastReset !== today;
+};
+
+const markStateAsReset = () => {
+	const today = new Date().toLocaleDateString();
+	localStorage.setItem(LAST_RESET_KEY, today);
+};
+
 type Action =
 	| { type: 'reset' }
 	| { type: 'wakeTime/hour'; payload: number }
@@ -76,9 +109,9 @@ const sleepReducer = (state: AppState, action: Action): AppState => {
 			updatedState.totalSleepDebt =
 				nap1.debt + nap2.debt - (nap3.sleep + nap3.rest);
 			updatedState.bedTime = getBedTime(updatedState.totalSleepDebt);
-			return updatedState;
+			break;
 		case 'napData/reset':
-			return {
+			updatedState = {
 				...state,
 				napData: {
 					...state.napData,
@@ -88,32 +121,39 @@ const sleepReducer = (state: AppState, action: Action): AppState => {
 						debt: 0,
 					},
 				},
+				totalSleepDebt: state.totalSleepDebt,
+				bedTime: state.bedTime,
 			};
+			break;
 		case 'wakeTime/hour':
 			updatedState = {
 				...state,
 				wakeTime: { ...state.wakeTime, hour: action.payload },
 			};
 			updatedState.nap1Time = getNap1Time(updatedState.wakeTime);
-			return updatedState;
+			break;
 		case 'wakeTime/minute':
 			updatedState = {
 				...state,
 				wakeTime: { ...state.wakeTime, minute: action.payload },
 			};
 			updatedState.nap1Time = getNap1Time(updatedState.wakeTime);
-			return updatedState;
+			break;
 		case 'wakeTime/reset':
-			return {
+			updatedState = {
 				...state,
 				wakeTime: initialState.wakeTime,
 				nap1Time: initialState.nap1Time,
 			};
+			break;
 		case 'reset':
-			return initialState;
+			updatedState = initialState;
+			break;
 		default:
-			return state;
+			updatedState = state;
 	}
+	saveStateToLocalStorage(updatedState);
+	return updatedState;
 };
 
 const SleepContext = createContext<{
@@ -125,7 +165,32 @@ const SleepContext = createContext<{
 });
 
 const SleepProvider = ({ children }: { children: ReactNode }) => {
-	const [state, dispatch] = useReducer(sleepReducer, initialState);
+	const [state, dispatch] = useReducer(
+		sleepReducer,
+		shouldResetState()
+			? initialState
+			: loadStateFromLocalStorage() || initialState,
+	);
+
+	useEffect(() => {
+		saveStateToLocalStorage(state);
+		markStateAsReset();
+	}, [state]);
+
+	useEffect(() => {
+		const now = new Date();
+		const msUntilMidnight =
+			new Date(
+				now.getFullYear(),
+				now.getMonth(),
+				now.getDate() + 1,
+			).getTime() - now.getTime();
+		const timer = setTimeout(() => {
+			dispatch({ type: 'reset' });
+		}, msUntilMidnight);
+
+		return () => clearTimeout(timer);
+	}, []);
 
 	return (
 		<SleepContext.Provider value={{ state, dispatch }}>
