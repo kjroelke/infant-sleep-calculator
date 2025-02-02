@@ -66,12 +66,19 @@ export default function WakeTime() {
 					</SelectContent>
 				</Select>
 			</CardContent>
-			<CardFooter>
+			<CardFooter className='flex gap-2'>
 				<Button
 					onClick={() => {
 						dispatch({ type: 'wakeTime/reset' });
 					}}>
 					Reset Wake Time
+				</Button>
+				<Button
+					variant={'secondary'}
+					onClick={() => {
+						dispatch({ type: 'reset' });
+					}}>
+					Reset All
 				</Button>
 			</CardFooter>
 		</Card>
