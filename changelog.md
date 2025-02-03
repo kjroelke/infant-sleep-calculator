@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.3.0] - Feb 2, 2025
+
+-   Update target bedtime and add nap messages
+
 ## [0.2.0] - Feb 2, 2025
 
 -   Made a PWA
