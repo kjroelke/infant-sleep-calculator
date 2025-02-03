@@ -39,7 +39,7 @@ export function getBedTime(sleepDebt: number): string {
 		'en-US',
 		{ hour: 'numeric', minute: '2-digit' },
 	] as const;
-	const idealBedTime = parse('6:00 PM', format, new Date());
+	const idealBedTime = parse('7:00 PM', format, new Date());
 	if (0 === sleepDebt) {
 		return idealBedTime.toLocaleTimeString(...timeStringArgs);
 	}
