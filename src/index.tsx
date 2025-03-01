@@ -3,6 +3,15 @@ import { createRoot } from 'react-dom/client';
 import './index.css';
 import App from './App';
 import { SleepProvider } from './lib/SleepContext';
+import updateThemeColor from './updateThemeColor';
+
+// Initial theme color update
+updateThemeColor();
+
+// Listen for changes in color scheme
+window
+	.matchMedia('(prefers-color-scheme: dark)')
+	.addEventListener('change', updateThemeColor);
 
 const root = document.getElementById('root')!;
 createRoot(root).render(

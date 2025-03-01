@@ -15,56 +15,31 @@ import {
 	CardFooter,
 	CardHeader,
 } from '@/components/ui/card';
+import TimeSelect from './TimeSelect';
 
 export default function WakeTime() {
 	const {
 		state: { wakeTime },
 		dispatch,
 	} = useContext(SleepContext);
-	function handleSetWakeTime(id: 'hour' | 'minute', value: string) {
-		dispatch({ type: `wakeTime/${id}`, payload: parseInt(value, 10) });
+	function handleSetWakeTime({
+		id,
+		value,
+	}: {
+		id: 'hour' | 'minute';
+		value: string;
+	}) {
+		dispatch({ type: `wakeTime/${id}`, payload: value });
 	}
 	return (
 		<Card>
 			<CardHeader>Wake Time</CardHeader>
 			<CardContent className='flex gap-2'>
-				<Select
-					value={`${wakeTime.hour}`}
-					onValueChange={(value) => handleSetWakeTime('hour', value)}>
-					<SelectTrigger>
-						<SelectValue placeholder={wakeTime.hour} />
-					</SelectTrigger>
-					<SelectContent>
-						{[5, 6, 7, 8, 9].map((hour) => (
-							<SelectItem
-								key={`hour-${hour}`}
-								value={`${hour}`}>
-								{hour}
-							</SelectItem>
-						))}
-					</SelectContent>
-				</Select>
-				<Select
-					value={`${wakeTime.minute}`}
-					onValueChange={(value) =>
-						handleSetWakeTime('minute', value)
-					}>
-					<SelectTrigger>
-						<SelectValue placeholder={wakeTime.minute} />
-					</SelectTrigger>
-					<SelectContent>
-						{Array.from({ length: 60 }).map((_, min) => {
-							const minute = min.toString().padStart(2, '0');
-							return (
-								<SelectItem
-									key={`minute-${minute}`}
-									value={minute}>
-									{minute}
-								</SelectItem>
-							);
-						})}
-					</SelectContent>
-				</Select>
+				<TimeSelect
+					value={wakeTime}
+					onValueChange={handleSetWakeTime}
+					options={[5, 6, 7, 8]}
+				/>
 			</CardContent>
 			<CardFooter className='flex gap-2'>
 				<Button
