@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.4.0] - Mar 1, 2025
+
+-   Updated sleep debt calculations
+
 ## [0.3.0] - Feb 2, 2025
 
 -   Update target bedtime and add nap messages
