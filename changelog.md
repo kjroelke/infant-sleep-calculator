@@ -1,6 +1,6 @@
 # Changelog
 
-## [0.4.0] - Feb 9, 2025
+## [0.4.0] - Mar 1, 2025
 
 -   Updated sleep debt calculations
 
