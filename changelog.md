@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.4.1] - Mar 8, 2025
+
+-   Cleanup `StrictMode` call and migrate header and footer to their own components.
+
 ## [0.4.0] - Mar 1, 2025
 
 -   Updated sleep debt calculations
